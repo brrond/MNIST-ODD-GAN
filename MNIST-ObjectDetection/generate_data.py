@@ -1,9 +1,9 @@
 import argparse
-import mnist
 import pathlib
 import cv2
 import numpy as np
 import tqdm
+import tensorflow as tf
 
 
 def calculate_iou(prediction_box, gt_box):
@@ -169,7 +169,11 @@ if __name__ == "__main__":
         "--max-digits-per-image", default=20, type=int
     )
     args = parser.parse_args()
-    X_train, Y_train, X_test, Y_test = mnist.load()
+
+    print("Loading MNIST from tf.keras")
+    (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.mnist.load_data()
+    print("MNIST dataset was Loaded")
+
     for dataset, (X, Y) in zip(["train", "test"], [[X_train, Y_train], [X_test, Y_test]]):
         num_images = args.num_train_images if dataset == "train" else args.num_test_images
         generate_dataset(
