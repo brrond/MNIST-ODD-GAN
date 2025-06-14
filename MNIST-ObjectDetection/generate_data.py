@@ -4,20 +4,21 @@ import cv2
 import numpy as np
 import tqdm
 import tensorflow as tf
+from coordinates import image_to_yolo, yolo_to_image
 
 
-def calculate_iou(prediction_box, gt_box):
+def calculate_iou(prediction_box, gt_box, imsize):
     """Calculate intersection over union of single predicted and ground truth box.
     Args:
         prediction_box (np.array of floats): location of predicted object as
             [xmin, ymin, xmax, ymax]
-        gt_box (np.array of floats): location of ground truth object as
-            [xmin, ymin, xmax, ymax]
+        gt_box (np.array of floats): location of ground truth object as yolo bbox
+        imsize: image size
         returns:
             float: value of the intersection of union for the two boxes.
     """
-    # YOUR CODE HERE
-    x1_t, y1_t, x2_t, y2_t = gt_box
+    x1_t, y1_t, x2_t, y2_t = yolo_to_image(gt_box, imsize)
+
     x1_p, y1_p, x2_p, y2_p = prediction_box
     if (x2_t < x1_p or x2_p < x1_t or y2_t < y1_p or y2_p < y1_t):
         return 0.0
@@ -38,11 +39,11 @@ def calculate_iou(prediction_box, gt_box):
     return iou
 
 
-def compute_iou_all(bbox, all_bboxes):
+def compute_iou_all(bbox, all_bboxes, imsize):
     ious = [0]
     for other_bbox in all_bboxes:
         ious.append(
-            calculate_iou(bbox, other_bbox)
+            calculate_iou(bbox, other_bbox, imsize)
         )
     return ious
 
@@ -118,7 +119,7 @@ def generate_dataset(dirpath: pathlib.Path,
                 width = np.random.randint(min_digit_size, max_digit_size)
                 x0 = np.random.randint(0, imsize-width)
                 y0 = np.random.randint(0, imsize-width)
-                ious = compute_iou_all([x0, y0, x0+width, y0+width], bboxes)
+                ious = compute_iou_all([x0, y0, x0+width, y0+width], bboxes, imsize)
                 if max(ious) < 0.25:
                     break
             digit_idx = np.random.randint(0, len(mnist_images))
@@ -129,7 +130,10 @@ def generate_dataset(dirpath: pathlib.Path,
             assert im[y0:y0+width, x0:x0+width].shape == digit.shape, \
                 f"imshape: {im[y0:y0+width, x0:x0+width].shape}, digit shape: {digit.shape}"
             bbox = tight_bbox(digit, [x0, y0, x0+width, y0+width])
-            bboxes.append(bbox)
+
+            yolo_bbox = image_to_yolo(bbox, imsize)
+
+            bboxes.append(yolo_bbox)
 
             im[y0:y0+width, x0:x0+width] += digit
             im[im > max_image_value] = max_image_value
@@ -138,10 +142,9 @@ def generate_dataset(dirpath: pathlib.Path,
         im = im.astype(np.uint8)
         cv2.imwrite(str(image_target_path), im)
         with open(label_target_path, "w") as fp:
-            fp.write("label,xmin,ymin,xmax,ymax\n")
             for l, bbox in zip(labels, bboxes):
                 bbox = [str(_) for _ in bbox]
-                to_write = f"{l}," + ",".join(bbox) + "\n"
+                to_write = f"{l} " + " ".join(bbox) + "\n"
                 fp.write(to_write)
 
 
