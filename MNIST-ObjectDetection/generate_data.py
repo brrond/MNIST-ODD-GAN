@@ -100,7 +100,8 @@ def generate_dataset(dirpath: pathlib.Path,
                      imsize: int,
                      max_digits_per_image: int,
                      mnist_images: np.ndarray,
-                     mnist_labels: np.ndarray):
+                     mnist_labels: np.ndarray,
+                     dataset: str):
     if dataset_exists(dirpath, num_images):
         return
     max_image_value = 255
@@ -109,7 +110,7 @@ def generate_dataset(dirpath: pathlib.Path,
     label_dir = dirpath.joinpath("labels")
     image_dir.mkdir(exist_ok=True, parents=True)
     label_dir.mkdir(exist_ok=True, parents=True)
-    for image_id in tqdm.trange(num_images, desc=f"Generating dataset, saving to: {dirpath}"):
+    for image_id in tqdm.trange(num_images, desc=f"Generating {dataset} dataset, saving to: {dirpath}"):
         im = np.zeros((imsize, imsize), dtype=np.float32)
         labels = []
         bboxes = []
@@ -154,7 +155,7 @@ if __name__ == "__main__":
         "--base-path", default="data/mnist_detection"
     )
     parser.add_argument(
-        "--imsize", default=300, type=int
+        "--imsize", default=320, type=int
     )
     parser.add_argument(
         "--max-digit-size", default=100, type=int
@@ -169,16 +170,36 @@ if __name__ == "__main__":
         "--num-test-images", default=1000, type=int
     )
     parser.add_argument(
+        "--num-validation-images", default=1000, type=int
+    )
+    parser.add_argument(
         "--max-digits-per-image", default=20, type=int
     )
+    parser.add_argument(
+        "--seed", default=42, type=int
+    )
     args = parser.parse_args()
+
+    # set random seed to generate the same dataset on each call
+    np.random.seed(args.seed)
 
     print("Loading MNIST from tf.keras")
     (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.mnist.load_data()
     print("MNIST dataset was Loaded")
 
-    for dataset, (X, Y) in zip(["train", "test"], [[X_train, Y_train], [X_test, Y_test]]):
-        num_images = args.num_train_images if dataset == "train" else args.num_test_images
+    # split test dataset into test and validation
+    X_val = X_test[:X_test.shape[0] // 2]
+    Y_val = Y_test[:Y_test.shape[0] // 2]
+    X_test = X_test[X_test.shape[0] // 2:]
+    Y_test = Y_test[Y_test.shape[0] // 2:]
+
+    for dataset, (X, Y) in zip(["train", "test", "validation"], [[X_train, Y_train], [X_test, Y_test], [X_val, Y_val]]):
+        num_images = args.num_train_images
+        if dataset == "test":
+            num_images = args.num_test_images
+        elif dataset == "validation":
+            num_images = args.num_validation_images
+
         generate_dataset(
             pathlib.Path(args.base_path, dataset),
             num_images,
@@ -187,4 +208,5 @@ if __name__ == "__main__":
             args.imsize,
             args.max_digits_per_image,
             X,
-            Y) 
+            Y,
+            dataset)
