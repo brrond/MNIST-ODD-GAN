@@ -13,3 +13,10 @@ Command to generated the dataset:
 python generate_data.py --num-test-images 100 --num-train-images 100 --max-digits-per-image 8
 ```
 
+Install torch environment:
+```
+conda env create -f environment.yml
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+```
+
+
