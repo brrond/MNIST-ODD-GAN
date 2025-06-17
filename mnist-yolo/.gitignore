@@ -1,0 +1,2 @@
+# ignore ultralytics models
+*.pt
