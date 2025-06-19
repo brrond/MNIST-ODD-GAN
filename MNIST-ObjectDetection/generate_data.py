@@ -1,3 +1,4 @@
+import os
 import argparse
 import pathlib
 import cv2
@@ -108,8 +109,10 @@ def generate_dataset(dirpath: pathlib.Path,
     assert mnist_images.dtype == np.uint8
     image_dir = dirpath.joinpath("images")
     label_dir = dirpath.joinpath("labels")
+    class_dir = dirpath.joinpath("classification")
     image_dir.mkdir(exist_ok=True, parents=True)
     label_dir.mkdir(exist_ok=True, parents=True)
+    class_dir.mkdir(exist_ok=True, parents=True)
     for image_id in tqdm.trange(num_images, desc=f"Generating {dataset} dataset, saving to: {dirpath}"):
         im = np.zeros((imsize, imsize), dtype=np.float32)
         labels = []
@@ -138,6 +141,11 @@ def generate_dataset(dirpath: pathlib.Path,
 
             im[y0:y0+width, x0:x0+width] += digit
             im[im > max_image_value] = max_image_value
+
+            class_dir_for_current_class = class_dir.joinpath(str(label))
+            class_dir_for_current_class.mkdir(exist_ok=True, parents=True)
+            next_img_idx = max(list(map(int, [s.split(".")[0] for s in os.listdir(class_dir_for_current_class)])) + [0,]) + 1
+            cv2.imwrite(str(class_dir_for_current_class.joinpath(f"{next_img_idx}.png")), digit)
         image_target_path = image_dir.joinpath(f"{image_id}.png")
         label_target_path = label_dir.joinpath(f"{image_id}.txt")
         im = im.astype(np.uint8)
