@@ -99,18 +99,6 @@ class BasicGAN(tf.keras.Model):
                 "Generation Results", image.reshape((1,) + image.shape), epoch
             )
 
-    def generate_random(self, n: int) -> tf.Tensor:
-        """
-        Generates random subset from generator.
-
-        :param n: number of samples to generate (aka batch_size)
-        :returns: np.ndarray output of the generator
-        """
-
-        rand = tf.random.normal((n, self.latent_dim, 1))
-        out = self.gen(rand, training=False)
-        return out
-
     def _save_models(self, epoch: int):
         """
         Saves both models (generator and discriminator) to the logdir
@@ -121,3 +109,12 @@ class BasicGAN(tf.keras.Model):
         if epoch % WRITE_MODELS_AFTER_N_EPOCH == 0:
             self.gen.save(self.logdir / f"gen-{epoch}.keras")
             self.disc.save(self.logdir / f"disc-{epoch}.keras")
+
+    def generate_random(self, n: int) -> tf.Tensor:
+        """
+        Generates random subset from generator.
+
+        :param n: number of samples to generate (aka batch_size)
+        :returns: np.ndarray output of the generator
+        """
+        raise NotImplementedError("This method must be implemented in every subclass")

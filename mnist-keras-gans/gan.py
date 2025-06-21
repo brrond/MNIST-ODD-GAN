@@ -74,6 +74,7 @@ class GAN(BasicGAN):
         super().__init__(logdir, latent_dim)
 
         self.latent_dim = latent_dim
+        self.latent_dim_shape = (latent_dim,)
         self.disc = GAN.create_discriminator()
         self.gen = GAN.create_generator((self.latent_dim,))
 
@@ -118,6 +119,7 @@ class GAN(BasicGAN):
         return {"d_loss": d_loss, "g_loss": g_loss}
 
     def generate_random(self, n: int) -> tf.Tensor:
-        generated = super().generate_random(n)
+        rand = tf.random.normal((n, self.latent_dim, 1))
+        generated = self.gen(rand, training=False)
         shape = tf.shape(generated)
         return tf.reshape(generated, (shape[0], 28, 28, 1))
