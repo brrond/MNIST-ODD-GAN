@@ -18,6 +18,8 @@ ADAM_BETA_2 = 0.999
 
 WRITE_MODELS_AFTER_N_EPOCH = 50
 
+DATASET_BASE_DIR = Path("../MNIST-ObjectDetection/data/mnist_detection/")
+
 
 # Functions
 def draw_images(images: np.ndarray, grid: tuple[int, int] = (5, 5)) -> Any:
@@ -49,6 +51,53 @@ def draw_images(images: np.ndarray, grid: tuple[int, int] = (5, 5)) -> Any:
     fig.canvas
     canvas.draw()
     return canvas
+
+
+def get_dataset() -> np.ndarray:
+    """
+    Returns the loaded Dataset from DATASET_BASE_DIR.
+    Uses keras API to load the dataset from directory
+    and then filters out the labels.
+    """
+    dataset_train = tf.keras.preprocessing.image_dataset_from_directory(
+        DATASET_BASE_DIR / "train" / "classification",
+        label_mode="categorical",
+        color_mode="grayscale",
+        image_size=(28, 28),
+        shuffle=True,
+        seed=42,
+    )
+    dataset_test = tf.keras.preprocessing.image_dataset_from_directory(
+        DATASET_BASE_DIR / "test" / "classification",
+        label_mode="categorical",
+        color_mode="grayscale",
+        image_size=(28, 28),
+        shuffle=True,
+        seed=42,
+    )
+    dataset_validation = tf.keras.preprocessing.image_dataset_from_directory(
+        DATASET_BASE_DIR / "validation" / "classification",
+        label_mode="categorical",
+        color_mode="grayscale",
+        image_size=(28, 28),
+        shuffle=True,
+        seed=42,
+    )
+
+    dataset_combined = dataset_train.concatenate(dataset_test).concatenate(
+        dataset_validation
+    )
+
+    images_list = []
+    for batch in dataset_combined:
+        x, y = batch
+        for img in x:
+            images_list.append(img)
+    images = np.array(images_list)
+
+    # normalize from -1 to 1
+    images = (images / 255.0) * 2 - 1
+    return images
 
 
 # Classes
