@@ -32,19 +32,16 @@ class DCGAN(BasicGAN):
         return tf.keras.Sequential(
             [
                 tf.keras.layers.Input(shape=input_shape),
-                tf.keras.layers.Conv2D(
-                    32, 5, strides=2, padding="same", activation="relu"
-                ),
+                tf.keras.layers.Conv2D(128, 5, strides=2, padding="same"),
+                tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
                 tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
                 tf.keras.layers.Dropout(DROPOUT_RATE),
-                tf.keras.layers.Conv2D(
-                    64, 5, strides=2, padding="same", activation="relu"
-                ),
+                tf.keras.layers.Conv2D(64, 5, strides=2, padding="same"),
+                tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
                 tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
                 tf.keras.layers.Dropout(DROPOUT_RATE),
-                tf.keras.layers.Conv2D(
-                    128, 5, strides=2, padding="same", activation="relu"
-                ),
+                tf.keras.layers.Conv2D(32, 5, strides=2, padding="same"),
+                tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
                 tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
                 tf.keras.layers.Dropout(DROPOUT_RATE),
                 tf.keras.layers.Flatten(),
@@ -73,7 +70,7 @@ class DCGAN(BasicGAN):
                 tf.keras.layers.Reshape((7, 7, 256)),
                 tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
                 tf.keras.layers.Conv2DTranspose(
-                    128, 5, strides=1, padding="same", use_bias=False
+                    512, 5, strides=1, padding="same", use_bias=False
                 ),
                 tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
                 tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
@@ -83,13 +80,28 @@ class DCGAN(BasicGAN):
                 tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
                 tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
                 tf.keras.layers.Conv2DTranspose(
-                    1, 5, strides=2, padding="same", activation="tanh", use_bias=False
+                    128, 5, strides=2, padding="same", use_bias=False
+                ),
+                tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
+                tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
+                tf.keras.layers.Conv2DTranspose(
+                    64, 5, strides=1, padding="same", use_bias=False
+                ),
+                tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
+                tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
+                tf.keras.layers.Conv2DTranspose(
+                    32, 5, strides=1, padding="same", use_bias=False
+                ),
+                tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
+                tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
+                tf.keras.layers.Conv2DTranspose(
+                    1, 5, strides=1, padding="same", activation="tanh", use_bias=False
                 ),
             ],
             name="MNIST_DCGAN_Generator",
         )
 
-        assert gen.output_shape == (None, 28, 28, 1)
+        assert gen.output_shape == (None, 28, 28, 1), gen.output_shape
         return gen
 
     def __init__(self, logdir: Path, latent_dim=100):
