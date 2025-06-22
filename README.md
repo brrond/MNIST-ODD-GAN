@@ -2,6 +2,8 @@
 
 MNIST-Object-Detection-Dataset-GAN
 
+The repository is the part of a project for "Bildverarbeitung und Bildverstehen". It contains some custom implementations of the most well-known GANs to generate MNIST images.
+
 ## MNIST-ObjectDetection
 
 Original repo: https://github.com/hukkelas/MNIST-ObjectDetection/blob/master/generate_data.py
@@ -20,17 +22,18 @@ python generate_data.py --num-test-images 100 --num-train-images 100 --num-valid
 
 ## Environments
 
+Environments are really tricky to manage if the GPU support is needed. Another problem is, ultralytics (framework to train yolo models) uses pytorch as backend, but I prefer to use tf/keras for my experiments. The best solution I came up with is to use two different environments.
+
 Install torch environment:
 ```
 conda env create -f torch-environment.yml
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 ```
 
-
 Install tf environment:
 ```
 conda env create -f tf-environment.yml
 ```
 
-
+I would simply say: works on my machine
 
