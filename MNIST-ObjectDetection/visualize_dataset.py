@@ -40,8 +40,12 @@ if __name__ == "__main__":
     base_path = pathlib.Path(args.directory)
     image_dir = base_path.joinpath("images")
     label_dir = base_path.joinpath("labels")
-    impaths = image_dir.glob("*.png")
-    for impath in impaths:
+    impaths = list(image_dir.glob("*.png"))
+    for i in range(4):
+        plt.subplot(2, 2, i + 1)
+        plt.axis(False)
+
+        impath = impaths[i]
         label_path = label_dir.joinpath(
             f"{impath.stem}.txt"
         )
@@ -50,5 +54,7 @@ if __name__ == "__main__":
         plt.imshow(im, cmap="gray")
         for bbox, label in zip(bboxes_XYXY, labels):
             plot_bbox(bbox, label, im.shape[0])
-        plt.savefig("example_image.png")
-        plt.show()
+
+    plt.tight_layout()
+    plt.savefig("example_image.png")
+    plt.show()
