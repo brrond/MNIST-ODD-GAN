@@ -65,7 +65,12 @@ class WGAN(BasicGAN):
                 tf.keras.layers.Reshape((7, 7, 256)),
                 tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
                 tf.keras.layers.Conv2DTranspose(
-                    512, 5, strides=1, padding="same", use_bias=False
+                    1024, 5, strides=1, padding="same", use_bias=False
+                ),
+                tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
+                tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
+                tf.keras.layers.Conv2DTranspose(
+                    512, 5, strides=2, padding="same", use_bias=False
                 ),
                 tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
                 tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
@@ -75,17 +80,12 @@ class WGAN(BasicGAN):
                 tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
                 tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
                 tf.keras.layers.Conv2DTranspose(
-                    128, 5, strides=2, padding="same", use_bias=False
+                    128, 5, strides=1, padding="same", use_bias=False
                 ),
                 tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
                 tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
                 tf.keras.layers.Conv2DTranspose(
                     64, 5, strides=1, padding="same", use_bias=False
-                ),
-                tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
-                tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
-                tf.keras.layers.Conv2DTranspose(
-                    32, 5, strides=1, padding="same", use_bias=False
                 ),
                 tf.keras.layers.BatchNormalization(momentum=BATCH_NORM_MOMENTUM),
                 tf.keras.layers.LeakyReLU(LEAKY_RELU_ALPHA),
