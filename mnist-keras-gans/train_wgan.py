@@ -18,6 +18,4 @@ if len(sys.argv) == 3:
     model.gen = tf.keras.models.load_model(genpath)
     model.disc = tf.keras.models.load_model(discpath)
 
-# user different (smaller) batch size here to ensure, that the critic has some time to become slightly better than gen
-# is necessary to make the training process a bit longer to implement n_critic logic from the paper
-history = model.fit(images, callbacks=model.callbacks, epochs=3001, batch_size=8)
+history = model.fit(images, callbacks=model.callbacks, epochs=1001, batch_size=8)
