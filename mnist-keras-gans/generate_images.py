@@ -3,6 +3,7 @@ from pathlib import Path
 from PIL import Image
 from argparse import ArgumentParser
 
+import numpy as np
 import seaborn as sb
 import tensorflow as tf
 from matplotlib import pyplot as plt
@@ -30,6 +31,65 @@ def show(images, labels=None):
     plt.show()
 
 
+def generate_label(gen, label, initial_confidence, n):
+    """
+    Generates n random digits with label from gen.
+    The process starts with the initial_confidence level.
+    :return: np.ndarray of images
+    """
+
+    samples = []
+
+    curr_confidence = initial_confidence
+
+    while len(samples) < n:
+
+        # generate random noise
+        z = tf.random.normal(
+            (
+                n * 10,
+                latent_dim,
+            )
+        )
+
+        # generate images
+        generated = gen(z)
+        generated = (generated.numpy().reshape((-1, 28, 28)) * 255).astype("uint8")
+
+        # classify images
+        labels = classifier(generated)
+        labels = labels.numpy()
+
+        # select only samples with confidence level > current confidence
+        confidences = labels.max(-1)
+        mask = confidences > curr_confidence
+
+        # transform one-hot encoded vectors in labels
+        labels = labels.argmax(-1)
+
+        # select the images and labels
+        generated = generated[mask]
+        labels = labels[mask]
+
+        # sb.displot(labels, bins=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        # plt.show()
+
+        # show(generated, labels)
+
+        # sb.displot(labels, bins=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+        # select only images with label label
+        label_mask = labels == label
+        generated = generated[label_mask]
+
+        for img in generated:
+            samples.append(img)
+
+        curr_confidence *= 0.1
+
+    return np.array(samples)
+
+
 if __name__ == "__main__":
     argparser = ArgumentParser("generate_images.py")
     argparser.add_argument(
@@ -46,38 +106,22 @@ if __name__ == "__main__":
         type=int,
         default=100,
     )
+    argparser.add_argument(
+        "--confidence",
+        help="The level of confidences of the models.",
+        type=float,
+        default=0.8,
+    )
 
     argv = argparser.parse_args()
     genpath = argv.genpath
     latent_dim = argv.latent_dim
     ipc = argv.images_per_class
-    n = ipc * 10
+    confidence_level = argv.confidence
 
     gen = tf.keras.models.load_model(genpath)
 
-    z = tf.random.normal(
-        (
-            n,
-            latent_dim,
-        )
-    )
-    generated = gen(z)
-    generated = generated.numpy().reshape((n, 28, 28))
-
     classifier = tf.keras.models.load_model("../mnist-classification/classifier.keras")
-
-    labels = classifier(generated)
-    labels = labels.numpy()
-
-    confidences = labels.max(-1)
-    labels = labels.argmax(-1)
-
-    sb.displot(labels, bins=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-    plt.show()
-
-    show(generated, labels)
-
-    sb.displot(labels, bins=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
     plt.figure(figsize=(10, 4))
     plt.title("Images")
@@ -87,18 +131,13 @@ if __name__ == "__main__":
         plt.subplot(2, 5, i + 1)
         plt.axis(False)
 
-        idx = labels == i
-        gen_subset = (generated[idx] * 255).astype("uint8")
+        gen_subset = generate_label(gen, i, confidence_level, ipc)
 
-        lab_subset = labels[idx]
         if len(gen_subset) != 0:
             plt.imshow(gen_subset[0], cmap="gray")
-            plt.title(lab_subset[0])
+            plt.title(i)
 
-        if len(gen_subset) < ipc:
-            print(f"There are not enough samples for the {i} class.")
-
-        for j in range(min(ipc, len(gen_subset))):
+        for j in range(ipc):
             classdir = DATA_PATH / str(i)
             filename = f"{j}.png"
             os.makedirs(classdir, exist_ok=True)
