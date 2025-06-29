@@ -85,7 +85,8 @@ def generate_label(gen, label, initial_confidence, n):
         for img in generated:
             samples.append(img)
 
-        curr_confidence *= 0.1
+        if len(generated) == 0:
+            curr_confidence *= 0.9
 
     return np.array(samples)
 
