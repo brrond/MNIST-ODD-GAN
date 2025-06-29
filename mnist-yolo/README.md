@@ -13,6 +13,8 @@ Following models were trained:
 
 | Path | Description | mAP@0.5 |
 | ---- | ----------- | ------- |
-| runs/detect/train | yolo11s pre-trained | 0.911 |
+| runs/detect/train | yolo11s pretrained | 0.911 |
 | runs/detect/train2 | yolo11s fresh | 0.883 |
+| runs/detect/train3 | yolo11s pretrained | 0.0051 |
+| runs/detect/train4 | yolo11s | skipped |
 
