@@ -1,6 +1,7 @@
 import os
 import argparse
 import pathlib
+import typing
 import cv2
 import numpy as np
 import tqdm
@@ -186,14 +187,52 @@ if __name__ == "__main__":
     parser.add_argument(
         "--seed", default=42, type=int
     )
+    parser.add_argument(
+        "--source", default=None, type=pathlib.Path,
+    )
     args = parser.parse_args()
 
     # set random seed to generate the same dataset on each call
     np.random.seed(args.seed)
 
-    print("Loading MNIST from tf.keras")
-    (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.mnist.load_data()
-    print("MNIST dataset was Loaded")
+    source = args.source
+    if source == None:
+        print("Loading MNIST from tf.keras")
+        (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.mnist.load_data()
+        print("MNIST dataset was Loaded")
+    else:
+        dataset_train, dataset_test = tf.keras.preprocessing.image_dataset_from_directory(
+                source,
+                label_mode="int",
+                color_mode="grayscale",
+                image_size=(28, 28),
+                shuffle=True,
+                validation_split=.5,
+                subset="both",
+                seed=args.seed,
+            )
+
+        X_train = []
+        Y_train = []
+        for batch in dataset_train:
+            x, y = batch
+            for img in x:
+                X_train.append(img)
+            for lab in y:
+                Y_train.append(lab)
+        X_train = np.array(X_train).astype("uint8")
+        Y_train = np.array(Y_train).astype("uint8")
+
+        X_test = []
+        Y_test = []
+        for batch in dataset_test:
+            x, y = batch
+            for img in x:
+                X_test.append(img)
+            for lab in y:
+                Y_test.append(lab)
+        X_test = np.array(X_test).astype("uint8")
+        Y_test = np.array(Y_test).astype("uint8")
 
     # split test dataset into test and validation
     X_val = X_test[:X_test.shape[0] // 2]

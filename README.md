@@ -20,6 +20,11 @@ Large dataset (with 300 images total as 100/100/100):
 python generate_data.py --num-test-images 100 --num-train-images 100 --num-validation-images 100 --max-digits-per-image 8 --seed 42 --imsize 320 --min-digit-size 40 --max-digit-size 120
 ```
 
+Custom datasets:
+```
+python generate_data.py --num-test-images 0 --num-train-images 10000 --num-validation-images 0 --max-digits-per-image 8 --seed 42 --imsize 320 --min-digit-size 40 --max-digit-size 120 --source ../mnist-keras-gans/data/wgan/
+```
+
 ## Environments
 
 Environments are really tricky to manage if the GPU support is needed. Another problem is, ultralytics (framework to train yolo models) uses pytorch as backend, but I prefer to use tf/keras for my experiments. The best solution I came up with is to use two different environments.
