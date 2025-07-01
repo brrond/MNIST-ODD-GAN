@@ -1,0 +1,17 @@
+Validating runs\detect\train4\weights\best.pt...
+Ultralytics 8.3.155  Python-3.9.21 torch-2.7.1+cu128 CUDA:0 (NVIDIA GeForce GTX 1660 Ti, 6144MiB)
+YOLO11s summary (fused): 100 layers, 9,416,670 parameters, 0 gradients, 21.3 GFLOPs
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100%|██████████| 2/2 [00:00<00:00,  4.73it/s]
+                   all         45        184      0.295      0.229      0.237      0.108
+                     0         19         22      0.112     0.0455     0.0302     0.0158
+                     1         14         17     0.0531     0.0588     0.0368     0.0148
+                     2         22         28      0.198      0.143       0.12     0.0556
+                     3         16         18      0.103      0.667        0.2     0.0774
+                     4         14         16          0          0     0.0979     0.0442
+                     5         16         18      0.461      0.192      0.322      0.131
+                     6         13         15      0.418     0.0667      0.183     0.0865
+                     7         15         19      0.296      0.421      0.263      0.121
+                     8          8          9      0.672      0.333      0.678      0.362
+                     9         16         22      0.634      0.364       0.44      0.171
+Speed: 0.2ms preprocess, 3.3ms inference, 0.0ms loss, 2.2ms postprocess per image
+Results saved to runs\detect\train4
