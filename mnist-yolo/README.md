@@ -21,4 +21,8 @@ Following models were trained:
 | runs/detect/train6 | yolo11s fresh DCGAN | 0.423 |
 | runs/detect/train7 | yolo11s pretrained WGAN | 0.29 |
 | runs/detect/train8 | yolo11s fresh WGAN | 0.41 |
+| runs/detect/train9 | yolo11s pretrained DCGAN + Real90 | 0.943 |
+| runs/detect/train10 | yolo11s pretrained DCGAN + Real90 | 0.925 |
+| runs/detect/train11 | yolo11s Real300 | 0.953 |
+| runs/detect/train12 | yolo11s Real300 | 0.961 |
 
