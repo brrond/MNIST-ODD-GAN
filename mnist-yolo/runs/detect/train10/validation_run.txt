@@ -1,0 +1,17 @@
+Validating runs\detect\train10\weights\best.pt...
+Ultralytics 8.3.155  Python-3.9.21 torch-2.7.1+cu128 CUDA:0 (NVIDIA GeForce GTX 1660 Ti, 6144MiB)
+YOLO11s summary (fused): 100 layers, 9,416,670 parameters, 0 gradients, 21.3 GFLOPs
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100%|██████████| 1/1 [00:00<00:00,  4.13it/s]
+                   all         30        116      0.853      0.851      0.925        0.8
+                     0         12         15      0.856          1      0.991      0.912
+                     1          9         11          1      0.813      0.914      0.764
+                     2         15         19      0.763      0.847      0.948      0.717
+                     3         10         12      0.716      0.917      0.913      0.823
+                     4          8          9       0.87      0.744      0.941      0.766
+                     5         12         13      0.973      0.769      0.873      0.715
+                     6          7          7      0.766          1      0.964      0.914
+                     7         10         12      0.919      0.944      0.976      0.825
+                     8          5          5      0.815        0.6      0.762       0.72
+                     9          9         13       0.85      0.873      0.963      0.849
+Speed: 0.2ms preprocess, 2.9ms inference, 0.0ms loss, 1.3ms postprocess per image
+Results saved to runs\detect\train10
