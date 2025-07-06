@@ -41,8 +41,9 @@ if __name__ == "__main__":
     image_dir = base_path.joinpath("images")
     label_dir = base_path.joinpath("labels")
     impaths = list(image_dir.glob("*.png"))
-    for i in range(4):
-        plt.subplot(2, 2, i + 1)
+    plt.figure(figsize=(15, 7))
+    for i in range(10):
+        plt.subplot(2, 5, i + 1)
         plt.axis(False)
 
         impath = impaths[i]
